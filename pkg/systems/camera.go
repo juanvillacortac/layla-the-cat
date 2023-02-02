@@ -5,30 +5,43 @@ import (
 	"layla/pkg/config"
 	"layla/pkg/tags"
 	"math"
+	"math/rand"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi/ecs"
 )
 
 func UpdateCamera(ecs *ecs.ECS) {
-	camera := components.GetCamera(ecs)
-	if camera == nil {
+	entry, ok := tags.Player.First(ecs.World)
+	if !ok {
 		return
 	}
-	player := components.GetObject(tags.Player.MustFirst(ecs.World))
+	camera := components.Camera.Get(entry)
+	player := components.GetObject(entry)
 
-	dx := Lerp(camera.X, player.X-float64(config.C.Width)/2, 0.05)
-	dy := Lerp(camera.Y, player.Y-float64(config.C.Height)/2, 0.05)
-
-	if camera.W > config.C.Width {
-		camera.X = math.Max(0, math.Min(dx, float64(camera.W-config.C.Width)))
+	if camera.ShakeMagnitude != 0 {
+		min := int(-camera.ShakeMagnitude)
+		max := int(camera.ShakeMagnitude)
+		camera.ShakeValueX = float64(rand.Intn(max-min) + min)
+		camera.ShakeValueY = float64(rand.Intn(max-min) + min)
 	} else {
-		camera.X = -float64(config.C.Width-camera.W) / 2
+		camera.ShakeValueX = 0
+		camera.ShakeValueY = 0
 	}
-	camera.Y = math.Max(0, math.Min(dy, float64(camera.H-config.C.Height)))
-}
 
-func DrawCamera(ecs *ecs.ECS, screen *ebiten.Image) {
+	px, py := player.X+player.W/2, player.Y
+
+	dx := Lerp(camera.X, px-float64(config.Width)/2, 0.06)
+	dy := Lerp(camera.Y, py-float64(config.Height)/2, 0.12)
+
+	if camera.W > config.Width {
+		camera.X = math.Max(0, math.Min(dx, float64(camera.W-config.Width)))
+	} else {
+		camera.X = -float64(config.Width-camera.W) / 2
+	}
+	camera.Y = math.Max(0, math.Min(dy, float64(camera.H-config.Height)))
+
+	camera.X += camera.ShakeValueX
+	camera.Y += camera.ShakeValueY
 }
 
 func Lerp(a, b, t float64) float64 {

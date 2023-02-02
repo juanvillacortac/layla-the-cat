@@ -3,6 +3,7 @@ package systems
 import (
 	"layla/pkg/components"
 	"layla/pkg/tags"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi"
@@ -17,12 +18,22 @@ func UpdateParticles(ecs *ecs.ECS) {
 	})
 }
 
-func DrawParticles(ecs *ecs.ECS, screen *ebiten.Image) {
-	tags.Particles.Each(ecs.World, func(e *donburi.Entry) {
-		camera := components.GetCamera(ecs)
-		p := components.Particles.Get(e)
-		x, y := p.X-camera.X, p.Y-camera.Y
-		opt := ganim8.DrawOpts(x, y)
-		p.Anim.Draw(screen, opt)
-	})
+func drawParticles(screen *ebiten.Image, ecs *ecs.ECS, particle *components.ParticlesData) {
+	opt := ganim8.DrawOpts(particle.X, particle.Y)
+	if camera := components.GetCamera(ecs); camera != nil {
+		x, y := particle.X-math.Round(camera.X), particle.Y-math.Round(camera.Y)
+		opt.SetPos(x, y)
+	}
+	particle.Anim.Draw(screen, opt)
+}
+
+func DrawParticles(layer components.ParticlesLayer) func(ecs *ecs.ECS, screen *ebiten.Image) {
+	return func(ecs *ecs.ECS, screen *ebiten.Image) {
+		tags.Particles.Each(ecs.World, func(e *donburi.Entry) {
+			particle := components.Particles.Get(e)
+			if particle.Layer == layer {
+				drawParticles(screen, ecs, particle)
+			}
+		})
+	}
 }

@@ -10,7 +10,7 @@
 	},
 	"jsonVersion": "1.1.3",
 	"appBuildId": 464299,
-	"nextUid": 66,
+	"nextUid": 68,
 	"identifierStyle": "Capitalize",
 	"worldLayout": "LinearVertical",
 	"worldGridWidth": 256,
@@ -569,6 +569,67 @@
 			"pivotX": 0,
 			"pivotY": 0,
 			"fieldDefs": []
+		},
+		{
+			"identifier": "Pushable",
+			"uid": 66,
+			"tags": [],
+			"width": 16,
+			"height": 16,
+			"resizableX": false,
+			"resizableY": false,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#C19F35",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "Tile",
+					"__type": "Tile",
+					"uid": 67,
+					"type": "F_Tile",
+					"isArray": false,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "EntityTile",
+					"editorDisplayPos": "Above",
+					"editorAlwaysShow": false,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["80,144,16,16"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefTags": [],
+					"tilesetUid": 1
+				}
+			]
 		}
 	], "tilesets": [
 		{
@@ -664,7 +725,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Player",
-							"__grid": [5,8],
+							"__grid": [30,1],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
@@ -673,8 +734,22 @@
 							"width": 16,
 							"height": 16,
 							"defUid": 64,
-							"px": [80,128],
+							"px": [480,16],
 							"fieldInstances": []
+						},
+						{
+							"__identifier": "Pushable",
+							"__grid": [30,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 1, "x": 80, "y": 144, "w": 16, "h": 16 },
+							"__smartColor": "#C19F35",
+							"iid": "d12d2380-7820-11ed-b963-239d18faa893",
+							"width": 16,
+							"height": 16,
+							"defUid": 66,
+							"px": [480,80],
+							"fieldInstances": [{ "__identifier": "Tile", "__value": { "tilesetUid": 1, "x": 80, "y": 144, "w": 16, "h": 16 }, "__type": "Tile", "__tile": { "tilesetUid": 1, "x": 80, "y": 144, "w": 16, "h": 16 }, "defUid": 67, "realEditorValues": [] }]
 						}
 					]
 				},

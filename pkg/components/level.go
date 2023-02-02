@@ -3,12 +3,11 @@ package components
 import (
 	"layla/pkg/maps"
 
-	"github.com/solarlune/ldtkgo"
 	"github.com/yohamta/donburi"
 )
 
 type LevelData struct {
-	LdtkProject *ldtkgo.Project
+	LdtkProject *maps.LevelCtx
 	Renderer    *maps.EbitenRenderer
 }
 

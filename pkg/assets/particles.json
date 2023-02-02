@@ -1,5 +1,5 @@
 { "frames": {
-   "particles 0.aseprite": {
+   "particles #jump 0.aseprite": {
     "frame": { "x": 0, "y": 0, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 80
    },
-   "particles 1.aseprite": {
+   "particles #jump 1.aseprite": {
     "frame": { "x": 16, "y": 0, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 80
    },
-   "particles 2.aseprite": {
+   "particles #jump 2.aseprite": {
     "frame": { "x": 32, "y": 0, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
@@ -23,8 +23,40 @@
     "sourceSize": { "w": 16, "h": 16 },
     "duration": 80
    },
-   "particles 3.aseprite": {
+   "particles #jump 3.aseprite": {
     "frame": { "x": 48, "y": 0, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 80
+   },
+   "particles #fall 0.aseprite": {
+    "frame": { "x": 0, "y": 16, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 80
+   },
+   "particles #fall 1.aseprite": {
+    "frame": { "x": 16, "y": 16, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 80
+   },
+   "particles #fall 2.aseprite": {
+    "frame": { "x": 32, "y": 16, "w": 16, "h": 16 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
+    "sourceSize": { "w": 16, "h": 16 },
+    "duration": 80
+   },
+   "particles #fall 3.aseprite": {
+    "frame": { "x": 48, "y": 16, "w": 16, "h": 16 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 16, "h": 16 },
@@ -37,9 +69,11 @@
   "version": "1.2.40-dev",
   "image": "particles.png",
   "format": "RGBA8888",
-  "size": { "w": 64, "h": 16 },
+  "size": { "w": 64, "h": 32 },
   "scale": "1",
   "frameTags": [
+   { "name": "jump", "from": 0, "to": 3, "direction": "forward" },
+   { "name": "fall", "from": 4, "to": 7, "direction": "forward" }
   ],
   "layers": [
    { "name": "Layer 1", "opacity": 255, "blendMode": "normal" }

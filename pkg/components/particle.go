@@ -19,9 +19,16 @@ var (
 )
 
 type ParticlesType int
+type ParticlesLayer int
 
 const (
 	ParticlesJump ParticlesType = iota
+	ParticlesFall
+)
+
+const (
+	ParticlesFrontLayer ParticlesLayer = iota
+	ParticlesBackLayer
 )
 
 type ParticleAnimation struct {
@@ -37,12 +44,16 @@ func init() {
 		log.Fatal(err)
 	}
 	ParticlesSpriteSheet = ebiten.NewImageFromImage(img)
-	ParticlesGrid = ganim8.NewGrid(16, 16, 16*4, 16)
+	ParticlesGrid = ganim8.NewGrid(16, 16, 16*4, 16*2)
 
 	ParticlesAnimations = map[ParticlesType]ParticleAnimation{
 		ParticlesJump: {
 			Frames:   ParticlesGrid.Frames("1-4", 1),
 			Duration: 80 * time.Millisecond,
+		},
+		ParticlesFall: {
+			Frames:   ParticlesGrid.Frames("1-4", 2),
+			Duration: 40 * time.Millisecond,
 		},
 	}
 }
@@ -53,6 +64,7 @@ type ParticlesData struct {
 	X     float64
 	Y     float64
 	Anim  *ganim8.Animation
+	Layer ParticlesLayer
 }
 
 var Particles = donburi.NewComponentType[ParticlesData]()

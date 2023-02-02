@@ -4,6 +4,7 @@ import (
 	"layla/pkg/archetypes"
 	"layla/pkg/assets"
 	"layla/pkg/components"
+	"layla/pkg/entities"
 	"layla/pkg/maps"
 
 	"github.com/solarlune/ldtkgo"
@@ -12,54 +13,57 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func CreateLevel(ecs *ecs.ECS, name string) (level *donburi.Entry, space *donburi.Entry) {
-	level = archetypes.NewLevel(ecs)
+func CreateLevel(ecs *ecs.ECS, name string) *donburi.Entry {
+	level := archetypes.NewLevel(ecs)
 
 	project, err := assets.LoadMap(name)
 	if err != nil {
 		panic(err)
 	}
+
 	renderer := maps.NewEbitenRenderer(maps.NewDiskLoader())
 	renderer.Render(project.Levels[0])
-	components.Level.SetValue(level, components.LevelData{
-		LdtkProject: project,
+
+	ctx := maps.NewLevelCtx(project)
+
+	components.Level.Set(level, &components.LevelData{
+		LdtkProject: ctx,
 		Renderer:    renderer,
 	})
 
-	space = CreateSpace(ecs, project.Levels[0].Width, project.Levels[0].Height)
+	components.Space.Set(level, resolv.NewSpace(ctx.Level.Width, ctx.Level.Height, 2, 2))
 
-	InitLevelEntities(ecs, space, project.Levels[0])
-	InitLevelGrid(ecs, space, project.Levels[0])
+	CreateGridBg(ecs)
+	InitLevelEntities(ecs, level)
+	InitLevelGrid(ecs, level)
+	CreateTransition(ecs, false, func() {})
 
-	return
+	return level
 }
 
-func InitLevelEntities(ecs *ecs.ECS, space *donburi.Entry, level *ldtkgo.Level) {
-	for _, layer := range level.Layers {
+func InitLevelEntities(ecs *ecs.ECS, level *donburi.Entry) {
+	ctx := components.Level.Get(level).LdtkProject
+	for _, layer := range ctx.Level.Layers {
 		switch layer.Type {
 		case ldtkgo.LayerTypeEntity:
 			for _, entity := range layer.Entities {
-				if entity.Identifier == "Player" {
-					components.AddToSpace(space,
-						CreatePlayer(ecs, float64(entity.Position[0]), float64(entity.Position[1]), level.Width, level.Height),
-					)
+				if fn, ok := Entities[entities.EntityType(entity.Identifier)]; ok {
+					fn(ecs, level, ctx, layer, entity)
 				}
 			}
 		}
 	}
 }
 
-func InitLevelGrid(ecs *ecs.ECS, space *donburi.Entry, level *ldtkgo.Level) {
-	for _, layer := range level.Layers {
+func InitLevelGrid(ecs *ecs.ECS, level *donburi.Entry) {
+	ctx := components.Level.Get(level).LdtkProject
+	for _, layer := range ctx.Level.Layers {
 		switch layer.Type {
 		case ldtkgo.LayerTypeIntGrid:
 			for _, tile := range layer.IntGrid {
-				switch tile.Value {
-				case 1:
-					components.AddToSpace(space,
-						CreateWall(ecs, resolv.NewObject(float64(tile.Position[0]), float64(tile.Position[1]), 16, 16, "solid")),
-					)
-				}
+				components.AddToSpace(level,
+					CreateWall(ecs, resolv.NewObject(float64(tile.Position[0]), float64(tile.Position[1]), 16, 16, "solid")),
+				)
 			}
 		}
 	}

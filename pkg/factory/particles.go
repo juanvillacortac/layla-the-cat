@@ -9,7 +9,7 @@ import (
 	"github.com/yohamta/ganim8/v2"
 )
 
-func CreateParticles(ecs *ecs.ECS, particleType components.ParticlesType, x, y float64, flipX bool) *donburi.Entry {
+func CreateParticles(ecs *ecs.ECS, layer components.ParticlesLayer, particleType components.ParticlesType, x, y float64, flipX bool) *donburi.Entry {
 	particles := archetypes.NewParticles(ecs)
 
 	animKind := components.ParticlesAnimations[particleType]
@@ -22,10 +22,11 @@ func CreateParticles(ecs *ecs.ECS, particleType components.ParticlesType, x, y f
 	}
 
 	components.Particles.Set(particles, &components.ParticlesData{
-		Type: particleType,
-		X:    x,
-		Y:    y,
-		Anim: anim,
+		Type:  particleType,
+		X:     x,
+		Y:     y,
+		Anim:  anim,
+		Layer: layer,
 	})
 
 	return particles

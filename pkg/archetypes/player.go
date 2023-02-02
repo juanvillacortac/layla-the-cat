@@ -16,9 +16,11 @@ func NewPlayer(ecs *ecs.ECS) *donburi.Entry {
 		layers.Default,
 		tags.Player,
 		components.Player,
+		components.Entity,
 		components.Camera,
 		components.Object,
 		components.Input,
+		components.TimerSystem,
 	))
 
 	return entry

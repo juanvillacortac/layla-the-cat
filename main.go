@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	ebiten.SetWindowSize(config.C.BaseWidth*2, config.C.BaseHeight*2)
+	ebiten.SetWindowSize(config.Width*int(config.Scale), config.Height*int(config.Scale))
 	ebiten.SetWindowTitle("Layla the Cat")
 	if err := ebiten.RunGame(game.NewGame()); err != nil {
 		log.Fatal(err)

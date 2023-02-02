@@ -3,6 +3,8 @@ package layers
 import "github.com/yohamta/donburi/ecs"
 
 const (
-	Default ecs.LayerID = iota
-	Input   ecs.LayerID = iota
+	Background ecs.LayerID = iota
+	Default    ecs.LayerID = iota
+	Input      ecs.LayerID = iota
+	Transition ecs.LayerID = iota
 )

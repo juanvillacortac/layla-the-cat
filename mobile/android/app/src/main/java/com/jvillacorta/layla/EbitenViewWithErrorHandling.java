@@ -3,9 +3,9 @@ package com.jvillacorta.layla;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.jvillacorta.layla.mobile.EbitenView;
+import com.jvillacorta.layla.layla.EbitenView;
 
-class EbitenViewWithErrorHandling extends EbitenView {
+public class EbitenViewWithErrorHandling extends EbitenView {
     public EbitenViewWithErrorHandling(Context context) {
         super(context);
     }

@@ -1,72 +1,89 @@
 package scenes
 
 import (
+	"layla/pkg/components"
+	"layla/pkg/config"
+	"layla/pkg/events"
 	"layla/pkg/factory"
 	"layla/pkg/layers"
 	"layla/pkg/systems"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
+	e "github.com/yohamta/donburi/features/events"
+	"github.com/yohamta/donburi/filter"
 )
 
 type LevelScene struct {
-	ecs *ecs.ECS
+	name       string
+	ecs        *ecs.ECS
+	main       *ecs.ECS
+	pauseScene Scene
+	paused     bool
 }
 
-func NewLevelScene() *LevelScene {
-	ecs := ecs.NewECS(donburi.NewWorld())
+func NewLevelScene(main *ecs.ECS, name string) *LevelScene {
+	level := &LevelScene{main: main, ecs: ecs.NewECS(donburi.NewWorld()), name: name}
 
-	ecs.AddSystem(systems.UpdatePlayer)
-	ecs.AddSystem(systems.UpdateParticles)
-	ecs.AddSystem(systems.UpdateCamera)
+	events.PauseLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event events.PauseLevelEvent) {
+		level.paused = !level.paused
+		config.C.Touch = !level.paused
+		if level.paused && level.pauseScene == nil {
+			level.pauseScene = NewPauseScene(level.main, level.ecs)
+		} else {
+			level.pauseScene = nil
+		}
+	})
 
-	ecs.AddSystem(systems.UpdateInput)
+	events.RestartLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event events.RestartLevelEvent) {
+		config.C.Touch = true
+		if e, ok := components.Level.First(level.ecs.World); ok {
+			components.Level.Get(e).Renderer.Clear()
+			query := donburi.NewQuery(filter.Contains())
+			query.Each(level.ecs.World, func(e *donburi.Entry) {
+				e.Remove()
+			})
+		}
+		events.SwitchSceneEvents.Publish(level.main.World, events.SceneEvent{
+			Scene: NewLevelScene(level.main, level.name),
+		})
+	})
 
-	ecs.AddRenderer(layers.Default, systems.DrawWall)
-	ecs.AddRenderer(layers.Default, systems.DrawLevel)
-	ecs.AddRenderer(layers.Default, systems.DrawParticles)
-	ecs.AddRenderer(layers.Default, systems.DrawPlayer)
-	ecs.AddRenderer(layers.Default, systems.DrawCamera)
-	ecs.AddRenderer(layers.Default, systems.DrawCamera)
+	systems.AddSystems(level.ecs)
 
-	ecs.AddRenderer(layers.Input, systems.DrawInput)
+	factory.CreateLevel(level.ecs, name)
 
-	ls := &LevelScene{ecs: ecs}
+	level.ecs.AddRenderer(layers.Transition, systems.DrawTransitions)
 
-	factory.CreateLevel(ls.ecs, "another")
-
-	return ls
+	return level
 }
 
-func (ps *LevelScene) Update() {
-	ps.ecs.Update()
+func (level *LevelScene) Ecs() *ecs.ECS {
+	return level.ecs
 }
 
-func (ps *LevelScene) Draw(screen *ebiten.Image) {
-	ps.ecs.Draw(screen)
+func (level *LevelScene) Update() {
+	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
+		events.PauseLevelEvents.Publish(level.ecs.World, events.PauseLevelEvent{})
+	}
+
+	if !level.paused {
+		level.ecs.Update()
+	}
+
+	if level.pauseScene != nil {
+		level.pauseScene.Update()
+	}
+
+	e.ProcessAllEvents(level.ecs.World)
 }
 
-func (ps *LevelScene) init() {
+func (level *LevelScene) Draw(screen *ebiten.Image) {
+	level.ecs.Draw(screen)
 
-	// Define the world's Space. Here, a Space is essentially a grid (the game's width and height, or 640x360), made up of 16x16 cells. Each cell can have 0 or more Objects within it,
-	// and collisions can be found by checking the Space to see if the Cells at specific positions contain (or would contain) Objects. This is a broad, simplified approach to collision
-	// detection.
-	// space := factory.CreateSpace(ps.ecs)
-
-	// dresolv.Add(space,
-	// 	// Construct the solid level geometry. Note that the simple approach of checking cells in a Space for collision works simply when the geometry is aligned with the cells,
-	// 	// as it all is in this platformer example.
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(0, 0, 16, gh, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(gw-16, 0, 16, gh, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(0, 0, gw, 16, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(0, gh-24, gw, 32, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(160, gh-56, 160, 32, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(320, 64, 32, 160, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(64, 128, 16, 160, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(gw-128, 64, 128, 16, "solid")),
-	// 	factory.CreateWall(ps.ecs, resolv.NewObject(gw-128, gh-88, 128, 16, "solid")),
-	//
-	// 	factory.CreatePlayer(ps.ecs),
-	// )
+	if level.pauseScene != nil {
+		level.pauseScene.Draw(screen)
+	}
 }

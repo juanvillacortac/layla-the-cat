@@ -77,24 +77,31 @@ func (er *EbitenRenderer) Clear() {
 	for _, layer := range er.RenderedLayers {
 		layer.Image.Dispose()
 	}
+	for _, tileset := range er.Tilesets {
+		tileset.Dispose()
+	}
+	er.Tilesets = map[string]*ebiten.Image{}
 	er.RenderedLayers = []*RenderedLayer{}
 }
 
 // beginLayer gets called when necessary between rendering indidvidual Layers of a Level.
 func (er *EbitenRenderer) beginLayer(layer *ldtkgo.Layer, w, h int) {
 
-	_, exists := er.Tilesets[layer.Tileset.Path]
+	if layer.Tileset != nil {
+		_, exists := er.Tilesets[layer.Tileset.Path]
 
-	if !exists {
-		er.Tilesets[layer.Tileset.Path] = er.Loader.LoadTileset(layer.Tileset.Path)
+		if !exists {
+			er.Tilesets[layer.Tileset.Path] = er.Loader.LoadTileset(layer.Tileset.Path)
+		}
+
+		er.CurrentTileset = layer.Tileset.Path
 	}
-
-	er.CurrentTileset = layer.Tileset.Path
-
-	renderedImage := ebiten.NewImage(w, h)
-
-	er.RenderedLayers = append(er.RenderedLayers, &RenderedLayer{Image: renderedImage, Layer: layer})
-
+	if layer.Type != ldtkgo.LayerTypeEntity {
+		renderedImage := ebiten.NewImage(w, h)
+		er.RenderedLayers = append(er.RenderedLayers, &RenderedLayer{Image: renderedImage, Layer: layer})
+	} else {
+		er.RenderedLayers = append(er.RenderedLayers, &RenderedLayer{Layer: layer})
+	}
 }
 
 // renderTile gets called by LDtkgo.Layer.RenderTiles(), and is currently provided the following arguments to handle rendering each tile in a Layer:
@@ -139,17 +146,13 @@ func (er *EbitenRenderer) Render(level *ldtkgo.Level) {
 	er.Clear()
 
 	for _, layer := range level.Layers {
-
 		switch layer.Type {
-
 		case ldtkgo.LayerTypeIntGrid: // IntGrids get autotiles automatically
 			fallthrough
 		case ldtkgo.LayerTypeAutoTile:
 			fallthrough
 		case ldtkgo.LayerTypeTile:
-
 			if tiles := layer.AllTiles(); len(tiles) > 0 {
-
 				er.beginLayer(layer, level.Width, level.Height)
 
 				for _, tileData := range tiles {

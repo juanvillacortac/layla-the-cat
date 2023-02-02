@@ -1,33 +1,55 @@
 package config
 
-import "layla/pkg/platform"
+// import "layla/pkg/platform"
+
+type CrtQuality int
+
+const (
+	CrtQualityOff CrtQuality = iota
+	CrtQualityLow
+	CrtQualityHigh
+)
 
 type Config struct {
-	BaseWidth  int
-	BaseHeight int
+	InputScale float64
 
-	Width  int
-	Height int
-
-	Scale float64
-
-	Touch     bool
-	CrtShader bool
+	Touch      bool
+	CrtQuality CrtQuality
 }
 
+func (c *Config) ToggleCrtQuality() {
+	c.CrtQuality += 1
+	if c.CrtQuality > CrtQualityHigh {
+		c.CrtQuality = CrtQualityOff
+	}
+}
+
+var (
+	BaseWidth  = 640 / 3
+	BaseHeight = 360 / 3
+	Width      = BaseWidth
+	Height     = BaseHeight
+	Scale      = 4.0
+
+	DataDir = ""
+)
 var C *Config
 
 func init() {
+	// crt := CrtQualityHigh
+	// switch platform.Platform() {
+	// case platform.Wasm:
+	// 	crt = CrtQualityLow
+	// case platform.Mobile:
+	// 	crt = CrtQualityOff
+	// default:
+	// }
+
 	C = &Config{
-		BaseWidth:  640 / 2,
-		BaseHeight: 360 / 2,
+		InputScale: 1,
 
-		Width:  640 / 2,
-		Height: 360 / 2,
-
-		Scale: 2,
-
-		Touch:     platform.Platform() == platform.Mobile,
-		CrtShader: platform.Platform() != platform.Mobile,
+		// Touch:      platform.Platform() == platform.Mobile,
+		Touch: true,
+		// CrtQuality: crt,
 	}
 }
