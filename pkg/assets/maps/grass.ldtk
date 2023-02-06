@@ -2448,20 +2448,6 @@
 							"defUid": 114,
 							"px": [512,368],
 							"fieldInstances": []
-						},
-						{
-							"__identifier": "Goal",
-							"__grid": [10,3],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#9B94D9",
-							"iid": "88ffeb40-9f30-11ed-9bee-6789a2281216",
-							"width": 16,
-							"height": 16,
-							"defUid": 114,
-							"px": [160,48],
-							"fieldInstances": []
 						}
 					]
 				},
