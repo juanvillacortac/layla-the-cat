@@ -2,8 +2,10 @@ package game
 
 import (
 	"fmt"
+	"image"
 	"layla/pkg/config"
 	"layla/pkg/events"
+	"layla/pkg/input"
 	"layla/pkg/platform"
 	"layla/pkg/scenes"
 	"layla/pkg/shaders"
@@ -55,7 +57,7 @@ func (g *Game) init() {
 		g.scene = scene.Scene
 	})
 
-	text.LoadFont("CompassPro", 16)
+	text.LoadFont("default", 12)
 
 	if platform.Platform() == platform.Desktop {
 		// ebiten.SetFullscreen(true)
@@ -85,6 +87,7 @@ func (g *Game) init() {
 }
 
 func (g *Game) Update() error {
+	input.InputSystem.Update()
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
 	}
@@ -104,23 +107,27 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Clear()
 	g.vscreen.Clear()
 
-	g.scene.Draw(g.vscreen)
-
-	f := text.LoadFont("ExpressionPro", 16)
+	f := text.LoadFont("min", 16)
 	txt := fmt.Sprintf("FPS: %.2f\n", ebiten.ActualFPS())
-	x, y := 0., 8.
+	b := etext.BoundString(*f, txt)
 
 	opt := &ebiten.DrawImageOptions{}
 	opt.ColorScale.ScaleAlpha(0.2)
-	opt.GeoM.Translate(x, y)
-	etext.DrawWithOptions(g.vscreen, txt, *f, opt)
+	opt.GeoM.Translate(0, float64(b.Dy())-float64(b.Max.Y))
 
 	if config.C.CrtQuality != config.CrtQualityOff {
+		g.scene.Draw(g.vscreen)
+		etext.DrawWithOptions(g.vscreen, txt, *f, opt)
 		g.drawCRTImage(screen, g.vscreen)
 	} else {
-		opt := &ebiten.DrawImageOptions{}
-		// opt.GeoM.Scale(config.C.Scale, config.C.Scale)
-		screen.DrawImage(g.vscreen, opt)
+		if platform.Platform() == platform.Mobile {
+			g.scene.Draw(screen)
+			etext.DrawWithOptions(screen, txt, *f, opt)
+		} else {
+			g.scene.Draw(g.vscreen)
+			etext.DrawWithOptions(g.vscreen, txt, *f, opt)
+			screen.DrawImage(g.vscreen, &ebiten.DrawImageOptions{})
+		}
 	}
 }
 
@@ -132,7 +139,9 @@ func (g *Game) Layout(width, height int) (int, int) {
 
 	sw, sh := g.vscreen.Size()
 	if sw != config.Width || sh != config.Height {
-		g.vscreen = ebiten.NewImage(config.Width, config.Height)
+		g.vscreen = ebiten.NewImageWithOptions(image.Rect(0, 0, config.Width, config.Height), &ebiten.NewImageOptions{
+			Unmanaged: false,
+		})
 	}
 
 	switch config.C.CrtQuality {

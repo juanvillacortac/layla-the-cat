@@ -44,6 +44,9 @@ var DitheringPng []byte
 //go:embed collectable.png
 var CollectablePng []byte
 
+//go:embed pause_frame.png
+var PauseFramePng []byte
+
 var LogoSprite *ebiten.Image
 var DitheringSprite *ebiten.Image
 var CollectableSprite *ebiten.Image
@@ -94,6 +97,30 @@ func init() {
 		panic(err)
 	}
 	PinchSprite = ebiten.NewImageFromImage(img)
+}
+
+//go:embed clock.png
+var ClockPng []byte
+var ClockSprite *ebiten.Image
+
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(ClockPng))
+	if err != nil {
+		panic(err)
+	}
+	ClockSprite = ebiten.NewImageFromImage(img)
+}
+
+//go:embed goal.png
+var GoalPng []byte
+var GoalSprite *ebiten.Image
+
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(GoalPng))
+	if err != nil {
+		panic(err)
+	}
+	GoalSprite = ebiten.NewImageFromImage(img)
 }
 
 func LoadMap(name string) (*ldtkgo.Project, error) {

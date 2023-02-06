@@ -14,4 +14,5 @@ var (
 	Camera      = donburi.NewTag().SetName("Camera")
 	Particles   = donburi.NewTag().SetName("Particles")
 	Flash       = donburi.NewTag().SetName("Flash")
+	Goal        = donburi.NewTag().SetName("Goal")
 )

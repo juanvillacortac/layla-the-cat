@@ -4,6 +4,9 @@
 *.xcframework
 *.aar
 *.jar
+*.a
+*.h
+overlay.json
 bin/*
 !bin/steam_appid.txt
 

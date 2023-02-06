@@ -30,6 +30,10 @@ func UpdatePlayer(ecs *ecs.ECS, e *donburi.Entry) {
 	if player.Die {
 		return
 	}
+
+	if player.Time <= 0 {
+		KillPlayer(ecs, e)
+	}
 	playerObject := components.GetObject(e)
 
 	components.PlayerAnimations[player.State].Update()
@@ -143,6 +147,26 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 		}
 	}
 
+	if check := playerObject.Check(player.SpeedX, player.SpeedY, "goal"); check != nil {
+		slide := check.SlideAgainstCell(check.Cells[0], "goal")
+		dx = slide.X()
+		player.SpeedX = 0
+	}
+
+	if check := playerObject.Check(0, 0, "goal"); check != nil {
+		if playerObject.Overlaps(check.Objects[0]) && player.OnGround != nil {
+			player.Die = true
+			check.Objects[0].Data = true
+			components.ShakeCamera(ecs, 1, time.Millisecond*200)
+			player.CountdownTimer.Cancel()
+			ts.After(time.Second, func() {
+				factory.CreateTransition(ecs, true, func() {
+					events.RestartLevelEvents.Publish(ecs.World, events.RestartLevelEvent{})
+				})
+			})
+		}
+	}
+
 	if check := playerObject.Check(player.SpeedX, 0, "pushable"); check != nil && (player.SpeedX > 0 || player.SpeedX < 0) && player.OnGround != nil {
 		fmt.Printf("%.2f\n", player.SpeedX)
 		pushable := check.Objects[0]
@@ -184,7 +208,7 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 
 	// We check for any solid / stand-able objects. In actuality, there aren't any other Objects
 	// with other tags in this Space, so we don't -have- to specify any tags, but it's good to be specific for clarity in this example.
-	if check := playerObject.Check(0, checkDistance, "solid", "ramp", "pushable", "enemy"); check != nil {
+	if check := playerObject.Check(0, checkDistance, "solid", "ramp", "pushable", "enemy", "goal"); check != nil {
 		// So! Firstly, we want to see if we jumped up into something that we can slide around horizontally to avoid bumping the Player's head.
 
 		// Sliding around a misspaced jump is a small thing that makes jumping a bit more forgiving, and is something different polished platformers
@@ -195,7 +219,10 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 		// We pass the first cell, and tags that we want to avoid when sliding (i.e. we don't want to slide into cells that contain other solid objects).
 
 		if enemies := check.ObjectsByTags("enemy"); len(enemies) > 0 {
-			KillPlayer(ecs, entry)
+			enemy := enemies[0]
+			if enemy.Overlaps(playerObject) {
+				KillPlayer(ecs, entry)
+			}
 		}
 
 		slide := check.SlideAgainstCell(check.Cells[0], "solid")
@@ -288,8 +315,10 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 				player.WallSliding = nil // Player's on the ground, so no wallsliding anymore.
 				player.Jumped = 0
 				if !player.Landed {
-					factory.CreateParticles(ecs, components.ParticlesFrontLayer, components.ParticlesFall, playerObject.X, player.OnGround.Y-player.OnGround.H, !player.FacingRight)
 					player.CoyoteTime = nil
+					if goals := check.ObjectsByTags("goal"); len(goals) == 0 {
+						factory.CreateParticles(ecs, components.ParticlesFrontLayer, components.ParticlesFall, playerObject.X, player.OnGround.Y-player.OnGround.H, !player.FacingRight)
+					}
 					// ebiten.Vibrate(&ebiten.VibrateOptions{
 					// 	Duration:  200 * time.Millisecond,
 					// 	Magnitude: 0.2,
@@ -352,6 +381,7 @@ func KillPlayer(ecs *ecs.ECS, e *donburi.Entry) {
 	factory.CreatePlayerCorpse(ecs, playerObject)
 	components.ShakeCamera(ecs, 4, time.Millisecond*200)
 	factory.CreateFlash(ecs, time.Millisecond*100)
+	player.CountdownTimer.Cancel()
 	ts.After(time.Second*2, func() {
 		factory.CreateTransition(ecs, true, func() {
 			events.RestartLevelEvents.Publish(ecs.World, events.RestartLevelEvent{})

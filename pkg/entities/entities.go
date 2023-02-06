@@ -9,6 +9,7 @@ type EntityType string
 type EntityRenderer func(ecs *ecs.ECS, screen *ebiten.Image)
 
 const (
+	Goal         EntityType = "Goal"
 	Player       EntityType = "Player"
 	PlayerCorpse EntityType = "PlayerCorpse"
 	Collectable  EntityType = "Collectable"

@@ -3,13 +3,17 @@ module layla
 go 1.19
 
 require (
-	github.com/hajimehoshi/ebiten/v2 v2.5.0-alpha.11
+	github.com/hajimehoshi/ebiten/v2 v2.5.0-alpha.12
 	github.com/solarlune/resolv v0.6.0
 	github.com/yohamta/ganim8/v2 v2.1.27
 )
 
 require (
+	github.com/hajimehoshi/bitmapfont/v2 v2.2.3 // indirect
+	github.com/hajimehoshi/hitsumabushi v0.0.0-20230202013610-f25407476520 // indirect
 	github.com/kvartborg/vector v0.1.2 // indirect
+	github.com/quasilyte/ebitengine-input v0.8.0 // indirect
+	github.com/quasilyte/gmath v0.0.0-20221217210116-fba37a2e15c7 // indirect
 	github.com/solarlune/ldtkgo v0.9.3 // indirect
 	github.com/tanema/gween v0.0.0-20221212145351-621cc8a459d1 // indirect
 	github.com/tidwall/gjson v1.6.4 // indirect

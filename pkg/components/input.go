@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"layla/pkg/assets"
 	"layla/pkg/config"
+	"layla/pkg/input"
 	"layla/pkg/touch"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -172,7 +173,7 @@ func (i *InputData) IsRunning(dir InputDirection) bool {
 				return true
 			}
 		}
-		return ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA)
+		return input.Handler.ActionIsPressed(input.ActionLeft)
 	default:
 		for _, id := range i.TouchIDs {
 			tx, ty := touch.TouchPos(id)
@@ -180,7 +181,7 @@ func (i *InputData) IsRunning(dir InputDirection) bool {
 				return true
 			}
 		}
-		return ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD)
+		return input.Handler.ActionIsPressed(input.ActionRight)
 	}
 }
 
@@ -192,9 +193,7 @@ func (i *InputData) IsReleasing() bool {
 			return true
 		}
 	}
-	keyboardDown := ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS)
-	gamepadDown := len(i.GamepadIDs) > 0 && ebiten.IsGamepadButtonPressed(i.GamepadIDs[0], ebiten.GamepadButton(ebiten.StandardGamepadButtonLeftBottom))
-	return (keyboardDown || gamepadDown) && i.IsJustJumping()
+	return input.Handler.ActionIsPressed(input.ActionDown) && i.IsJustJumping()
 }
 
 func (i *InputData) IsLongJumping() bool {
@@ -205,7 +204,7 @@ func (i *InputData) IsLongJumping() bool {
 			return true
 		}
 	}
-	return ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsKeyPressed(ebiten.KeyW)
+	return input.Handler.ActionIsPressed(input.ActionJump)
 }
 func (i *InputData) IsJustJumping() bool {
 	i.TouchIDs = inpututil.AppendJustPressedTouchIDs(i.TouchIDs[:0])
@@ -216,7 +215,7 @@ func (i *InputData) IsJustJumping() bool {
 		}
 	}
 
-	return inpututil.IsKeyJustPressed(ebiten.KeySpace) || inpututil.IsKeyJustPressed(ebiten.KeyW)
+	return input.Handler.ActionIsJustPressed(input.ActionJump)
 }
 
 func (i *InputData) IsRequestPause() bool {
@@ -228,5 +227,5 @@ func (i *InputData) IsRequestPause() bool {
 		}
 	}
 
-	return inpututil.IsKeyJustPressed(ebiten.KeyEscape)
+	return input.Handler.ActionIsJustPressed(input.ActionExit)
 }

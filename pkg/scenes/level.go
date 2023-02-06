@@ -9,7 +9,6 @@ import (
 	"layla/pkg/systems"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	e "github.com/yohamta/donburi/features/events"
@@ -65,10 +64,6 @@ func (level *LevelScene) Ecs() *ecs.ECS {
 }
 
 func (level *LevelScene) Update() {
-	if inpututil.IsKeyJustPressed(ebiten.KeyP) {
-		events.PauseLevelEvents.Publish(level.ecs.World, events.PauseLevelEvent{})
-	}
-
 	if !level.paused {
 		level.ecs.Update()
 	}

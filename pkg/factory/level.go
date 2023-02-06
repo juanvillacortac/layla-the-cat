@@ -31,7 +31,7 @@ func CreateLevel(ecs *ecs.ECS, name string) *donburi.Entry {
 		Renderer:    renderer,
 	})
 
-	components.Space.Set(level, resolv.NewSpace(ctx.Level.Width, ctx.Level.Height, 2, 2))
+	components.Space.Set(level, resolv.NewSpace(ctx.Level.Width, ctx.Level.Height, 4, 4))
 
 	CreateGridBg(ecs)
 	InitLevelEntities(ecs, level)

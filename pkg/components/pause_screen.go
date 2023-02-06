@@ -4,6 +4,7 @@ import (
 	"image"
 	"image/color"
 	"layla/pkg/config"
+	"layla/pkg/input"
 	"layla/pkg/touch"
 	"math"
 
@@ -13,6 +14,14 @@ import (
 	"github.com/yohamta/donburi"
 )
 
+type PauseScreenAction int
+
+const (
+	PauseScreenExit PauseScreenAction = iota
+	PauseScreenResume
+	PauseScreenRestart
+)
+
 type PauseScreenData struct {
 	BgOpacity   float64
 	OffsetY     float64
@@ -20,6 +29,8 @@ type PauseScreenData struct {
 	OffsetTween *gween.Tween
 
 	TouchIDs []ebiten.TouchID
+
+	Selected PauseScreenAction
 }
 
 var PauseScreenBgImage *ebiten.Image
@@ -111,7 +122,7 @@ func (i *PauseScreenData) IsRequestResume() bool {
 		}
 	}
 
-	return inpututil.IsKeyJustPressed(ebiten.KeyEscape)
+	return input.Handler.ActionIsJustPressed(input.ActionExit) || (input.Handler.ActionIsJustPressed(input.ActionSelect) && i.Selected == PauseScreenResume)
 }
 
 func (i *PauseScreenData) IsRequestRestart() bool {
@@ -123,7 +134,7 @@ func (i *PauseScreenData) IsRequestRestart() bool {
 		}
 	}
 
-	return inpututil.IsKeyJustPressed(ebiten.KeyR)
+	return input.Handler.ActionIsJustPressed(input.ActionSelect) && i.Selected == PauseScreenRestart
 }
 
 func (i *PauseScreenData) IsRequestExit() bool {
@@ -135,5 +146,5 @@ func (i *PauseScreenData) IsRequestExit() bool {
 		}
 	}
 
-	return inpututil.IsKeyJustPressed(ebiten.KeyX)
+	return input.Handler.ActionIsJustPressed(input.ActionSelect) && i.Selected == PauseScreenExit
 }

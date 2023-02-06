@@ -5,6 +5,8 @@ import (
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/entities"
+	"math"
+	"time"
 
 	"github.com/solarlune/ebitick"
 	"github.com/solarlune/resolv"
@@ -20,20 +22,29 @@ func CreatePlayer(ecs *ecs.ECS, x, y float64, viewportW, viewportH int) *donburi
 
 	wobj := resolv.NewObject(x, y+4, 16, 16-4, "wallsliding")
 	wobj.SetShape(resolv.NewRectangle(0, 0, 16, 16-4))
+	p := components.PlayerData{
+		FacingRight: true,
+		Time:        120,
+	}
+
+	ts := ebitick.NewTimerSystem()
+	components.TimerSystem.Set(player, ts)
+	loop := ts.After(time.Second, func() {
+		p.Time = int(math.Max(0, float64(p.Time-1)))
+	})
+	loop.Loop = true
+	p.CountdownTimer = loop
 
 	components.SetObject(player, obj)
 	components.Input.Set(player, &components.InputData{})
 	components.Entity.Set(player, &components.EntityData{Identifier: string(entities.Player)})
-	components.Player.SetValue(player, components.PlayerData{
-		FacingRight: true,
-	})
+	components.Player.Set(player, &p)
 	components.Camera.SetValue(player, components.CameraData{
 		X: x - float64(config.Width)/2,
 		Y: y - float64(config.Height)/2,
 		W: viewportW,
 		H: viewportH,
 	})
-	components.TimerSystem.Set(player, ebitick.NewTimerSystem())
 
 	return player
 }

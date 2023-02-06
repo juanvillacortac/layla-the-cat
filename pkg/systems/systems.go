@@ -32,11 +32,11 @@ func AddSystems(ecs *ecs.ECS) {
 	ecs.AddRenderer(layers.Default, DrawParticles(components.ParticlesBackLayer))
 	ecs.AddRenderer(layers.Default, esystems.DrawEntities(components.EntityBackLayer))
 	ecs.AddRenderer(layers.Default, DrawParticles(components.ParticlesFrontLayer))
-	ecs.AddRenderer(layers.Default, DrawLevelForeground)
-	ecs.AddRenderer(layers.Default, esystems.DrawEntities(components.EntityFrontLayer))
+	ecs.AddRenderer(layers.Foreground, DrawLevelForeground)
+	ecs.AddRenderer(layers.Foreground, esystems.DrawEntities(components.EntityFrontLayer))
 
-	ecs.AddRenderer(layers.Default, DrawPauseScreen)
-	ecs.AddRenderer(layers.Default, DrawTitleScreen)
+	ecs.AddRenderer(layers.Input, DrawPauseScreen)
+	ecs.AddRenderer(layers.Input, DrawTitleScreen)
 
 	ecs.AddRenderer(layers.Transition, DrawFlash)
 

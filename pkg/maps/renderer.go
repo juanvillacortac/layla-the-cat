@@ -97,7 +97,9 @@ func (er *EbitenRenderer) beginLayer(layer *ldtkgo.Layer, w, h int) {
 		er.CurrentTileset = layer.Tileset.Path
 	}
 	if layer.Type != ldtkgo.LayerTypeEntity {
-		renderedImage := ebiten.NewImage(w, h)
+		renderedImage := ebiten.NewImageWithOptions(image.Rect(0, 0, w, h), &ebiten.NewImageOptions{
+			Unmanaged: false,
+		})
 		er.RenderedLayers = append(er.RenderedLayers, &RenderedLayer{Image: renderedImage, Layer: layer})
 	} else {
 		er.RenderedLayers = append(er.RenderedLayers, &RenderedLayer{Layer: layer})

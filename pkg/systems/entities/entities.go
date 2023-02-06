@@ -15,10 +15,16 @@ func UpdateEntities(ecs *ecs.ECS) {
 		switch entities.EntityType(ent.Identifier) {
 		case entities.Player:
 			UpdatePlayer(ecs, e)
+
 		case entities.PlayerCorpse:
 			UpdatePlayerCorpse(ecs, e)
+
 		case entities.Collectable:
 			UpdateCollectable(ecs, e)
+
+		case entities.Goal:
+			UpdateGoal(ecs, e)
+
 		case entities.BrokenWall:
 			UpdateBrokenWall(ecs, e)
 		}
@@ -27,17 +33,24 @@ func UpdateEntities(ecs *ecs.ECS) {
 
 func DrawEntities(layer components.EntityLayer) func(ecs *ecs.ECS, screen *ebiten.Image) {
 	return func(ecs *ecs.ECS, screen *ebiten.Image) {
-		DrawEnemy(ecs, screen)
 		components.Entity.Each(ecs.World, func(e *donburi.Entry) {
 			ent := components.Entity.Get(e)
 			if ent.Layer == layer {
 				switch entities.EntityType(ent.Identifier) {
 				case entities.Player:
 					DrawPlayer(ecs, e, screen)
+
 				case entities.PlayerCorpse:
 					DrawPlayerCorpse(ecs, e, screen)
+
 				case entities.Collectable:
 					DrawCollectable(ecs, e, screen)
+
+				default:
+					if !e.HasComponent(components.AnimatedSprite) {
+						return
+					}
+					components.AnimatedSprite.Get(e).Draw(ecs, screen)
 				}
 			}
 		})

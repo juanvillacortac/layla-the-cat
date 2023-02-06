@@ -1,9 +1,17 @@
 package systems
 
 import (
+	"fmt"
+	"layla/pkg/assets"
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/events"
+	"layla/pkg/input"
+	"layla/pkg/platform"
+	"layla/pkg/text"
+
+	// "layla/pkg/input"
+	// "layla/pkg/platform"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -29,10 +37,19 @@ func UpdateInput(ecs *ecs.ECS) {
 }
 
 func DrawInput(ecs *ecs.ECS, screen *ebiten.Image) {
-	if !config.C.Touch {
-		return
-	}
 	components.Input.Each(ecs.World, func(e *donburi.Entry) {
+		if e.HasComponent(components.Player) {
+			p := components.Player.Get(e)
+			tOpt := &ebiten.DrawImageOptions{}
+			tOpt.GeoM.Translate(float64(components.INPUT_UI_GAP), float64(components.INPUT_UI_GAP))
+			screen.DrawImage(assets.ClockSprite, tOpt)
+			text.DrawShadowedText(screen, fmt.Sprint(p.Time), float64(components.INPUT_UI_GAP)+8+6, float64(components.INPUT_UI_GAP)+1, false)
+		}
+
+		if !config.C.Touch || platform.Platform() == platform.Desktop || input.Handler.GamepadConnected() {
+			return
+		}
+
 		input := components.Input.Get(e)
 
 		s := config.C.InputScale

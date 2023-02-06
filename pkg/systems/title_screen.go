@@ -13,7 +13,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	etext "github.com/hajimehoshi/ebiten/v2/text"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
@@ -48,29 +47,31 @@ func DrawTitleScreen(ecs *ecs.ECS, screen *ebiten.Image) {
 		ts := components.TitleScreen.Get(e)
 		w, _ := assets.LogoSprite.Size()
 		logoOpt := &ebiten.DrawImageOptions{}
-		logoOpt.GeoM.Translate(float64(config.Width/2-w/2), float64(components.PAUSE_UI_GAP)-ts.OffsetY)
+		logoOpt.GeoM.Translate(float64(config.Width/2-w/2), 8-ts.OffsetY)
 		screen.DrawImage(assets.LogoSprite, logoOpt)
 
 		if ts.ShowText {
-			f := text.LoadFont("ExpressionPro", 16)
 			txt := "Press SPACE to start"
 			if platform.Platform() == platform.Mobile {
 				txt = "Tap to start"
 			}
 
-			b := etext.BoundString(*f, txt)
-
-			x, y := float64(config.Width)/2-float64(b.Dx())/2, float64(config.Height)-float64(components.PAUSE_UI_GAP)-(float64(b.Dy())-float64(b.Max.Y))
-
-			stopt := &ebiten.DrawImageOptions{}
-			stopt.GeoM.Translate(x, y)
-			stopt.GeoM.Translate(1, 1)
-			stopt.ColorScale.Scale(0, 0, 0, 1)
-			stopt.ColorScale.ScaleAlpha(0.8)
-			etext.DrawWithOptions(screen, txt, *f, stopt)
-			topt := &ebiten.DrawImageOptions{}
-			topt.GeoM.Translate(x, y)
-			etext.DrawWithOptions(screen, txt, *f, topt)
+			text.DrawShadowedText(screen, txt, float64(config.Width)/2, float64(config.Height)-float64(components.PAUSE_UI_GAP)-4, true)
 		}
+		//
+		// f := text.LoadFont("min", 16)
+		// txt := fmt.Sprintf("Juan Villacorta - %v", time.Now().Year())
+		//
+		// b := etext.BoundString(*f, txt)
+		// x, y := float64(config.Width)/2-float64(b.Dx())/2, float64(config.Height)-8
+		// stopt := &ebiten.DrawImageOptions{}
+		// stopt.GeoM.Translate(x, y)
+		// stopt.GeoM.Translate(1, 1)
+		// stopt.ColorScale.Scale(0, 0, 0, 1)
+		// stopt.ColorScale.ScaleAlpha(0.8)
+		// etext.DrawWithOptions(screen, txt, *f, stopt)
+		// topt := &ebiten.DrawImageOptions{}
+		// topt.GeoM.Translate(x, y)
+		// etext.DrawWithOptions(screen, txt, *f, topt)
 	})
 }

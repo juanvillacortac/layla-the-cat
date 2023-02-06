@@ -26,6 +26,11 @@ var Entities map[entities.EntityType]EntityFactoryFn = map[entities.EntityType]E
 			CreateCollectable(ecs, float64(entity.Position[0]), float64(entity.Position[1])),
 		)
 	},
+	entities.Goal: func(ecs *ecs.ECS, space *donburi.Entry, ctx *maps.LevelCtx, layer *ldtkgo.Layer, entity *ldtkgo.Entity) {
+		components.AddToSpace(space,
+			CreateGoal(ecs, float64(entity.Position[0]), float64(entity.Position[1])),
+		)
+	},
 	entities.Saw: func(ecs *ecs.ECS, space *donburi.Entry, ctx *maps.LevelCtx, layer *ldtkgo.Layer, entity *ldtkgo.Entity) {
 		components.AddToSpace(space,
 			CreateSaw(ecs, float64(entity.Position[0]), float64(entity.Position[1])),

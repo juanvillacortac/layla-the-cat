@@ -23,7 +23,13 @@ func UpdateAnimatedSprites(ecs *ecs.ECS) {
 
 func DrawAnimatedSprites[T any](ecs *ecs.ECS, componentsType *donburi.ComponentType[T], screen *ebiten.Image) {
 	componentsType.Each(ecs.World, func(e *donburi.Entry) {
+		if !e.HasComponent(components.AnimatedSprite) {
+			return
+		}
 		spr := components.AnimatedSprite.Get(e)
+		if spr == nil {
+			return
+		}
 
 		opt := ganim8.DrawOpts(spr.X+spr.OffsetX, spr.Y+spr.OffsetY)
 		if camera := components.GetCamera(ecs); camera != nil && spr.HookCamera {

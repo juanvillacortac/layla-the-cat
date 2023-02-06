@@ -8,5 +8,5 @@ import (
 )
 
 func DrawEnemy(ecs *ecs.ECS, screen *ebiten.Image) {
-	DrawAnimatedSprites(ecs, components.AnimatedSprite, screen)
+	DrawAnimatedSprites(ecs, components.Entity, screen)
 }

@@ -53,17 +53,19 @@ func init() {
 }
 
 type PlayerData struct {
-	SpeedX      float64
-	SpeedY      float64
-	FacingRight bool
-	Landed      bool
-	OnGround    *resolv.Object
-	WallSliding *resolv.Object
-	Pushing     *resolv.Object
-	State       PlayerState
-	CoyoteTime  *ebitick.Timer
-	Jumped      int
-	Die         bool
+	SpeedX         float64
+	SpeedY         float64
+	FacingRight    bool
+	Landed         bool
+	OnGround       *resolv.Object
+	WallSliding    *resolv.Object
+	Pushing        *resolv.Object
+	State          PlayerState
+	CoyoteTime     *ebitick.Timer
+	CountdownTimer *ebitick.Timer
+	Jumped         int
+	Die            bool
+	Time           int
 }
 
 var Player = donburi.NewComponentType[PlayerData]()
