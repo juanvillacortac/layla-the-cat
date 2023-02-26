@@ -3,7 +3,7 @@ package systems
 import (
 	"layla/pkg/components"
 	"layla/pkg/config"
-	"layla/pkg/tags"
+	esystems "layla/pkg/systems/entities"
 	"math"
 	"math/rand"
 
@@ -11,12 +11,12 @@ import (
 )
 
 func UpdateCamera(ecs *ecs.ECS) {
-	entry, ok := tags.Player.First(ecs.World)
+	entry, ok := components.Camera.First(ecs.World)
 	if !ok {
 		return
 	}
 	camera := components.Camera.Get(entry)
-	player := components.GetObject(entry)
+	obj := components.GetObject(entry)
 
 	if camera.ShakeMagnitude != 0 {
 		min := int(-camera.ShakeMagnitude)
@@ -28,15 +28,27 @@ func UpdateCamera(ecs *ecs.ECS) {
 		camera.ShakeValueY = 0
 	}
 
-	px, py := player.X+player.W/2, player.Y
+	px, py := obj.X+obj.W/2, obj.Y+obj.H/2
 
-	dx := Lerp(camera.X, px-float64(config.Width)/2, 0.06)
-	dy := Lerp(camera.Y, py-float64(config.Height)/2, 0.12)
+	if entry.HasComponent(components.Player) {
+		py -= obj.H / 2
+		playerData := components.Player.Get(entry)
+		if playerData.SpeedY >= esystems.GRAVITY {
+			py += playerData.SpeedY * 4
+		}
+	}
+
+	dx := px - float64(config.Width)/2
+	dy := py - float64(config.Height)/2
+	// if camera.Lerp {
+	dx = Lerp(camera.X, dx, 0.10)
+	dy = Lerp(camera.Y, dy, 0.10)
+	// }
 
 	if camera.W > config.Width {
 		camera.X = math.Max(0, math.Min(dx, float64(camera.W-config.Width)))
 	} else {
-		camera.X = -float64(config.Width-camera.W) / 2
+		camera.X = -(float64(config.Width-camera.W) - obj.W) / 2
 	}
 	camera.Y = math.Max(0, math.Min(dy, float64(camera.H-config.Height)))
 

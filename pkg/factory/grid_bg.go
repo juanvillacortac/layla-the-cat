@@ -7,6 +7,7 @@ import (
 	"layla/pkg/assets"
 	"layla/pkg/components"
 	"layla/pkg/config"
+	"layla/pkg/tags"
 	"math"
 	"time"
 
@@ -33,17 +34,17 @@ func CreateGridBg(ecs *ecs.ECS) *donburi.Entry {
 
 	bg := archetypes.NewGridBackground(ecs)
 
-	components.AnimatedTilesGroup.Set(bg, components.NewAnimatedTilesGroup())
-
 	qx, qy := math.Ceil(float64(config.Width*2)/32), math.Ceil(float64(config.Height*2)/32)
 	for y := 0.0; y <= qy; y++ {
 		for x := 0.0; x <= qx; x++ {
-			tileEntry := archetypes.NewAnimTile(ecs)
-			components.AnimatedTile.Set(tileEntry, &components.AnimatedTileData{
+			tileEntry := archetypes.NewAnimatedSprite(ecs, tags.Background, components.Entity)
+			components.Entity.Set(tileEntry, &components.EntityData{
+				Layer: components.EntityBackgroundLayer,
+			})
+			components.AnimatedSprite.Set(tileEntry, &components.AnimatedSpriteData{
 				X: x * 32, Y: y * 32,
 				Anim: anim.Clone(),
 			})
-			components.AddToAnimTilesGroup(bg, tileEntry)
 		}
 	}
 

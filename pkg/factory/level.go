@@ -3,7 +3,9 @@ package factory
 import (
 	"layla/pkg/archetypes"
 	"layla/pkg/assets"
+	"layla/pkg/audio"
 	"layla/pkg/components"
+	"layla/pkg/data"
 	"layla/pkg/entities"
 	"layla/pkg/maps"
 
@@ -13,8 +15,18 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func CreateLevel(ecs *ecs.ECS, name string) *donburi.Entry {
+func CreateLevel(ecs *ecs.ECS, levelNumber int, deaths int) *donburi.Entry {
 	level := archetypes.NewLevel(ecs)
+
+	data.SavedData.LastPlayedLevel = levelNumber
+
+	var name string
+	if levelNumber > len(data.Levels)-1 {
+		name = data.Levels[0]
+		data.SavedData.LastPlayedLevel = 0
+	} else {
+		name = data.Levels[levelNumber]
+	}
 
 	project, err := assets.LoadMap(name)
 	if err != nil {
@@ -22,21 +34,33 @@ func CreateLevel(ecs *ecs.ECS, name string) *donburi.Entry {
 	}
 
 	renderer := maps.NewEbitenRenderer(maps.NewDiskLoader())
-	renderer.Render(project.Levels[0])
+	lvl := project.Levels[0]
+	renderer.Render(lvl)
 
 	ctx := maps.NewLevelCtx(project)
 
 	components.Level.Set(level, &components.LevelData{
 		LdtkProject: ctx,
-		Renderer:    renderer,
+		Number:      levelNumber,
+		Deaths:      deaths,
+	})
+	components.MapRenderer.Set(level, &components.MapRendererData{
+		Renderer: renderer,
 	})
 
 	components.Space.Set(level, resolv.NewSpace(ctx.Level.Width, ctx.Level.Height, 4, 4))
 
+	if lvl.BGImage != nil {
+		AppendBackground(level, lvl.BGImage.Path)
+	}
+
 	CreateGridBg(ecs)
 	InitLevelEntities(ecs, level)
 	InitLevelGrid(ecs, level)
-	CreateTransition(ecs, false, func() {})
+	CreateTransition(ecs, false, func() {
+		audio.PlayBGM("green-green.mp3")
+		audio.SetBGMVolume(0.7)
+	})
 
 	return level
 }

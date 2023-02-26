@@ -16,15 +16,15 @@ import (
 )
 
 type LevelScene struct {
-	name       string
+	number     int
 	ecs        *ecs.ECS
 	main       *ecs.ECS
 	pauseScene Scene
 	paused     bool
 }
 
-func NewLevelScene(main *ecs.ECS, name string) *LevelScene {
-	level := &LevelScene{main: main, ecs: ecs.NewECS(donburi.NewWorld()), name: name}
+func NewLevelScene(main *ecs.ECS, levelNumber int, deaths int) *LevelScene {
+	level := &LevelScene{main: main, ecs: ecs.NewECS(donburi.NewWorld()), number: levelNumber}
 
 	events.PauseLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event events.PauseLevelEvent) {
 		level.paused = !level.paused
@@ -39,20 +39,48 @@ func NewLevelScene(main *ecs.ECS, name string) *LevelScene {
 	events.RestartLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event events.RestartLevelEvent) {
 		config.C.Touch = true
 		if e, ok := components.Level.First(level.ecs.World); ok {
-			components.Level.Get(e).Renderer.Clear()
+			components.MapRenderer.Get(e).Renderer.Clear()
 			query := donburi.NewQuery(filter.Contains())
 			query.Each(level.ecs.World, func(e *donburi.Entry) {
 				e.Remove()
 			})
 		}
 		events.SwitchSceneEvents.Publish(level.main.World, events.SceneEvent{
-			Scene: NewLevelScene(level.main, level.name),
+			Scene: NewLevelScene(level.main, level.number, event.Deaths),
+		})
+	})
+
+	events.ExitLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event struct{}) {
+		config.C.Touch = true
+		if e, ok := components.Level.First(level.ecs.World); ok {
+			components.MapRenderer.Get(e).Renderer.Clear()
+			query := donburi.NewQuery(filter.Contains())
+			query.Each(level.ecs.World, func(e *donburi.Entry) {
+				e.Remove()
+			})
+		}
+		events.SwitchSceneEvents.Publish(level.main.World, events.SceneEvent{
+			Scene: NewWorldScreenScene(level.main),
+		})
+	})
+
+	events.WinLevelEvents.Subscribe(level.ecs.World, func(w donburi.World, event struct{}) {
+		config.C.Touch = true
+		if e, ok := components.Level.First(level.ecs.World); ok {
+			components.MapRenderer.Get(e).Renderer.Clear()
+			query := donburi.NewQuery(filter.Contains())
+			query.Each(level.ecs.World, func(e *donburi.Entry) {
+				e.Remove()
+			})
+		}
+		events.SwitchSceneEvents.Publish(level.main.World, events.SceneEvent{
+			Scene: NewLevelScene(level.main, level.number+1, 0),
 		})
 	})
 
 	systems.AddSystems(level.ecs)
 
-	factory.CreateLevel(level.ecs, name)
+	factory.CreateLevel(level.ecs, level.number, deaths)
 
 	level.ecs.AddRenderer(layers.Transition, systems.DrawTransitions)
 

@@ -13,6 +13,9 @@ func UpdateEntities(ecs *ecs.ECS) {
 	components.Entity.Each(ecs.World, func(e *donburi.Entry) {
 		ent := components.Entity.Get(e)
 		switch entities.EntityType(ent.Identifier) {
+		case entities.LevelItem:
+			UpdateLevelItem(ecs, e)
+
 		case entities.Player:
 			UpdatePlayer(ecs, e)
 

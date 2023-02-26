@@ -15,6 +15,8 @@ func NewTitleScreen(ecs *ecs.ECS) *donburi.Entry {
 		layers.Default,
 		components.TitleScreen,
 		components.TimerSystem,
+		// components.MapRenderer,
+		// components.Background,
 	))
 
 	return entry

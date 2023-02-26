@@ -20,10 +20,14 @@ type PauseLevelEvent struct{}
 
 var PauseLevelEvents = events.NewEventType[PauseLevelEvent]()
 
-type RestartLevelEvent struct{}
+type RestartLevelEvent struct {
+	Deaths int
+}
 
 var RestartLevelEvents = events.NewEventType[RestartLevelEvent]()
 
-var LoadLevelEvents = events.NewEventType[string]()
+var WinLevelEvents = events.NewEventType[struct{}]()
+
+var LoadLevelEvents = events.NewEventType[int]()
 
 var ExitLevelEvents = events.NewEventType[struct{}]()

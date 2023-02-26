@@ -18,4 +18,6 @@ const (
 	Pinch EntityType = "Pinch"
 
 	BrokenWall EntityType = "BrokenWall"
+
+	LevelItem EntityType = "Level"
 )

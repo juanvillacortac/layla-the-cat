@@ -15,6 +15,8 @@ type TitleScreenData struct {
 	TextTimer   *ebitick.Timer
 	ShowText    bool
 
+	Started bool
+
 	TouchIDs []ebiten.TouchID
 }
 

@@ -16,6 +16,19 @@ import (
 type EntityFactoryFn func(ecs *ecs.ECS, space *donburi.Entry, ctx *maps.LevelCtx, layer *ldtkgo.Layer, entity *ldtkgo.Entity)
 
 var Entities map[entities.EntityType]EntityFactoryFn = map[entities.EntityType]EntityFactoryFn{
+	entities.LevelItem: func(ecs *ecs.ECS, space *donburi.Entry, ctx *maps.LevelCtx, layer *ldtkgo.Layer, entity *ldtkgo.Entity) {
+		m := ""
+		n := 0
+		for _, prop := range entity.Properties {
+			if prop.Identifier == "map" {
+				m = prop.AsString()
+			}
+			if prop.Identifier == "n" {
+				n = prop.AsInt()
+			}
+		}
+		CreateLevelItem(ecs, m, n, float64(entity.Position[0]), float64(entity.Position[1]))
+	},
 	entities.Player: func(ecs *ecs.ECS, space *donburi.Entry, ctx *maps.LevelCtx, layer *ldtkgo.Layer, entity *ldtkgo.Entity) {
 		components.AddToSpace(space,
 			CreatePlayer(ecs, float64(entity.Position[0]), float64(entity.Position[1]), ctx.Level.Width, ctx.Level.Height),

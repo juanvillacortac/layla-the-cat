@@ -24,13 +24,14 @@ func UpdateInput(ecs *ecs.ECS) {
 
 	components.Input.Each(ecs.World, func(e *donburi.Entry) {
 		input := components.Input.Get(e)
+		player := components.Player.Get(e)
 		input.GamepadIDs = ebiten.AppendGamepadIDs(input.GamepadIDs[:0])
 		input.TouchIDs = inpututil.AppendJustPressedTouchIDs(input.TouchIDs[:0])
 		if len(input.TouchIDs) > 0 {
 			config.C.Touch = true
 		}
 
-		if input.IsRequestPause() {
+		if input.IsRequestPause() && !player.Die {
 			events.PauseLevelEvents.Publish(ecs.World, events.PauseLevelEvent{})
 		}
 	})
@@ -38,12 +39,24 @@ func UpdateInput(ecs *ecs.ECS) {
 
 func DrawInput(ecs *ecs.ECS, screen *ebiten.Image) {
 	components.Input.Each(ecs.World, func(e *donburi.Entry) {
+		if _, ok := components.StageCleared.First(ecs.World); ok {
+			return
+		}
 		if e.HasComponent(components.Player) {
 			p := components.Player.Get(e)
 			tOpt := &ebiten.DrawImageOptions{}
 			tOpt.GeoM.Translate(float64(components.INPUT_UI_GAP), float64(components.INPUT_UI_GAP))
 			screen.DrawImage(assets.ClockSprite, tOpt)
 			text.DrawShadowedText(screen, fmt.Sprint(p.Time), float64(components.INPUT_UI_GAP)+8+6, float64(components.INPUT_UI_GAP)+1, false)
+
+			if levelEntry, ok := components.Level.First(ecs.World); ok {
+				level := components.Level.Get(levelEntry)
+				dOpt := &ebiten.DrawImageOptions{}
+				dOpt.GeoM.Concat(tOpt.GeoM)
+				dOpt.GeoM.Translate(0, 10+4)
+				screen.DrawImage(assets.DeathsSprite, dOpt)
+				text.DrawShadowedText(screen, fmt.Sprint(level.Deaths), float64(components.INPUT_UI_GAP)+8+6, float64(components.INPUT_UI_GAP)+14+1, false)
+			}
 		}
 
 		if !config.C.Touch || platform.Platform() == platform.Desktop || input.Handler.GamepadConnected() {

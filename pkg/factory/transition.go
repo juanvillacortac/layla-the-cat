@@ -15,7 +15,7 @@ func CreateTransition(ecs *ecs.ECS, outro bool, action func()) *donburi.Entry {
 		X:         -64,
 		Outro:     outro,
 		EndAction: &action,
-		Speed:     8,
+		Speed:     12,
 	})
 
 	return transition

@@ -14,8 +14,15 @@ import (
 //go:embed maps/*.ldtk
 var MapsFS embed.FS
 
+//go:embed audio/**/*.wav
+//go:embed audio/**/*.mp3
+var AudioFS embed.FS
+
 //go:embed tilesets/*.png
 var TilesetsFS embed.FS
+
+//go:embed bg/*.png
+var BgFS embed.FS
 
 //go:embed fonts/*.ttf
 var FontsFS embed.FS
@@ -46,6 +53,9 @@ var CollectablePng []byte
 
 //go:embed pause_frame.png
 var PauseFramePng []byte
+
+//go:embed level_frame.png
+var LevelFramePng []byte
 
 var LogoSprite *ebiten.Image
 var DitheringSprite *ebiten.Image
@@ -111,6 +121,18 @@ func init() {
 	ClockSprite = ebiten.NewImageFromImage(img)
 }
 
+//go:embed skull.png
+var DeathsPng []byte
+var DeathsSprite *ebiten.Image
+
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(DeathsPng))
+	if err != nil {
+		panic(err)
+	}
+	DeathsSprite = ebiten.NewImageFromImage(img)
+}
+
 //go:embed goal.png
 var GoalPng []byte
 var GoalSprite *ebiten.Image
@@ -121,6 +143,30 @@ func init() {
 		panic(err)
 	}
 	GoalSprite = ebiten.NewImageFromImage(img)
+}
+
+//go:embed world-ui.png
+var WorldUiPng []byte
+var WorldUiSprite *ebiten.Image
+
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(WorldUiPng))
+	if err != nil {
+		panic(err)
+	}
+	WorldUiSprite = ebiten.NewImageFromImage(img)
+}
+
+//go:embed cursor.png
+var CursorUiPng []byte
+var CursorUiSprite *ebiten.Image
+
+func init() {
+	img, _, err := image.Decode(bytes.NewReader(CursorUiPng))
+	if err != nil {
+		panic(err)
+	}
+	CursorUiSprite = ebiten.NewImageFromImage(img)
 }
 
 func LoadMap(name string) (*ldtkgo.Project, error) {

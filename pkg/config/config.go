@@ -29,7 +29,7 @@ var (
 	BaseHeight = 360 / 3
 	Width      = BaseWidth
 	Height     = BaseHeight
-	Scale      = 4.0
+	Scale      = 3.0
 
 	DataDir = ""
 )

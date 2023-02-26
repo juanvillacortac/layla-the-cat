@@ -69,9 +69,9 @@ var (
 
 func UpdatePauseScreenLayout() {
 	cellsQuantity := 3
-	PAUSE_UI_GAP = 12 * int(config.C.InputScale)
+	PAUSE_UI_GAP = 12
 	PAUSE_UI_PIXEL_CELL_SIZE = 24
-	PAUSE_UI_CELL_SIZE = PAUSE_UI_PIXEL_CELL_SIZE * int(config.C.InputScale)
+	PAUSE_UI_CELL_SIZE = PAUSE_UI_PIXEL_CELL_SIZE
 
 	PAUSE_UI_EXIT_X = config.Width/2 - (PAUSE_UI_CELL_SIZE*cellsQuantity+PAUSE_UI_GAP*int(math.Max(0, float64(cellsQuantity)-1)))/2
 	PAUSE_UI_EXIT_Y = config.Height - PAUSE_UI_CELL_SIZE - PAUSE_UI_GAP

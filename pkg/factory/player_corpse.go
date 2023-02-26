@@ -2,6 +2,7 @@ package factory
 
 import (
 	"layla/pkg/archetypes"
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/entities"
 	"time"
@@ -13,6 +14,7 @@ import (
 )
 
 func CreatePlayerCorpse(ecs *ecs.ECS, obj *resolv.Object) *donburi.Entry {
+	audio.StopBGM()
 	corpse := archetypes.NewPlayerCorpse(ecs)
 	ts := ebitick.NewTimerSystem()
 	components.TimerSystem.Set(corpse, ts)
@@ -25,6 +27,7 @@ func CreatePlayerCorpse(ecs *ecs.ECS, obj *resolv.Object) *donburi.Entry {
 	components.Entity.Set(corpse, &components.EntityData{Identifier: string(entities.PlayerCorpse), Layer: components.EntityFrontLayer})
 	ts.After(time.Millisecond*500, func() {
 		data.Fall = true
+		audio.PlaySE("die.wav")
 	})
 	return corpse
 }

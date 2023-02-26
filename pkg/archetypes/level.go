@@ -16,7 +16,9 @@ func NewLevel(ecs *ecs.ECS) *donburi.Entry {
 		layers.Default,
 		tags.Level,
 		components.Level,
+		components.MapRenderer,
 		components.Space,
+		components.Background,
 	))
 
 	return entry

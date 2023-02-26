@@ -42,5 +42,7 @@ func CreatePauseScreen(ecs *ecs.ECS) *donburi.Entry {
 		Anim:    frameAnim.Clone(),
 	})
 
+	CreateCursorUi(ecs)
+
 	return p
 }

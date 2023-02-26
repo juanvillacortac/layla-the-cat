@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"layla/pkg/audio"
 	"layla/pkg/events"
 	"layla/pkg/factory"
 	"layla/pkg/systems"
@@ -21,14 +22,15 @@ func NewTitleScreenScene(main *ecs.ECS) *TitleScreenScene {
 
 	systems.AddSystems(menu.ecs)
 
+	audio.PlayBGM("title.mp3")
+	factory.CreateTitleScreen(menu.ecs)
 	factory.CreateGridBg(menu.ecs)
 	factory.CreateTransition(menu.ecs, false, func() {
-		factory.CreateTitleScreen(menu.ecs)
 	})
 
-	events.LoadLevelEvents.Subscribe(menu.ecs.World, func(w donburi.World, event string) {
+	events.LoadLevelEvents.Subscribe(menu.ecs.World, func(w donburi.World, event int) {
 		events.SwitchSceneEvents.Publish(menu.main.World, events.SceneEvent{
-			Scene: NewLevelScene(menu.main, event),
+			Scene: NewWorldScreenScene(menu.main),
 		})
 	})
 

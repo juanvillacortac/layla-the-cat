@@ -1,6 +1,7 @@
 package systems
 
 import (
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/events"
@@ -41,6 +42,7 @@ func UpdatePauseScreen(ecs *ecs.ECS) {
 
 		if p.IsRequestExit() {
 			factory.CreateTransition(ecs, true, func() {
+				audio.StopBGM()
 				events.ExitLevelEvents.Publish(ecs.World, struct{}{})
 			})
 		}

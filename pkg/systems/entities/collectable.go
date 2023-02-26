@@ -2,6 +2,7 @@ package esystems
 
 import (
 	"layla/pkg/assets"
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/factory"
 	"math"
@@ -25,6 +26,8 @@ func UpdateCollectable(ecs *ecs.ECS, e *donburi.Entry) {
 
 	if check := o.Check(0, 0, "player"); check != nil {
 		components.ShakeCamera(ecs, 1, time.Millisecond*200)
+		audio.PlaySE("sfx_3.wav")
+		audio.PlaySE("sfx_2.wav")
 		factory.CreateFlash(ecs, time.Millisecond*100)
 		e.Remove()
 	}

@@ -3,6 +3,7 @@ package game
 import (
 	"fmt"
 	"image"
+	"layla/pkg/audio"
 	"layla/pkg/config"
 	"layla/pkg/events"
 	"layla/pkg/input"
@@ -11,6 +12,7 @@ import (
 	"layla/pkg/shaders"
 	"layla/pkg/text"
 	"log"
+	"sync"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -36,15 +38,22 @@ type Game struct {
 	vscreen      *ebiten.Image
 	ShaderParams []ShaderParam
 	shader       *ebiten.Shader
+
+	loaded               bool
+	initializedResources sync.Once
+	resourceLoadedCh     chan error
 }
 
 func NewGame() *Game {
 	g := &Game{
-		vscreen: ebiten.NewImage(config.Width, config.Height),
-		ecs:     ecs.NewECS(donburi.NewWorld()),
+		vscreen:          ebiten.NewImage(config.Width, config.Height),
+		ecs:              ecs.NewECS(donburi.NewWorld()),
+		resourceLoadedCh: make(chan error),
 	}
 
-	g.init()
+	if err := g.InitResources(); err != nil {
+		log.Fatal(err)
+	}
 
 	return g
 }
@@ -52,12 +61,11 @@ func NewGame() *Game {
 func (g *Game) init() {
 	// g.scene = scenes.NewLevelScene(g.ecs, "grass")
 	g.scene = scenes.NewTitleScreenScene(g.ecs)
+	// g.scene = scenes.NewWorldScreenScene(g.ecs)
 
 	events.SwitchSceneEvents.Subscribe(g.ecs.World, func(w donburi.World, scene events.SceneEvent) {
 		g.scene = scene.Scene
 	})
-
-	text.LoadFont("default", 12)
 
 	if platform.Platform() == platform.Desktop {
 		// ebiten.SetFullscreen(true)
@@ -86,7 +94,37 @@ func (g *Game) init() {
 	}
 }
 
+func (g *Game) InitResources() error {
+	var err error
+	g.initializedResources.Do(func() {
+		go func() {
+			defer close(g.resourceLoadedCh)
+			text.LoadFont("default", 12)
+			if err := audio.Load(); err != nil {
+				g.resourceLoadedCh <- err
+				return
+			}
+		}()
+		if audioErr := audio.Finalize(); audioErr != nil {
+			err = audioErr
+		}
+	})
+	return err
+}
+
 func (g *Game) Update() error {
+	select {
+	case err := <-g.resourceLoadedCh:
+		if err != nil {
+			log.Fatal(err)
+		}
+		if !g.loaded {
+			g.init()
+			g.loaded = true
+		}
+	default:
+		return nil
+	}
 	input.InputSystem.Update()
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		ebiten.SetFullscreen(!ebiten.IsFullscreen())
@@ -104,7 +142,9 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	screen.Clear()
+	if !g.loaded {
+		return
+	}
 	g.vscreen.Clear()
 
 	f := text.LoadFont("min", 16)

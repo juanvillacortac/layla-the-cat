@@ -15,7 +15,7 @@ func NewGridBackground(ecs *ecs.ECS) *donburi.Entry {
 	entry := w.Entry(ecs.Create(
 		layers.Background,
 		tags.Background,
-		components.AnimatedTilesGroup,
+		components.Entity,
 	))
 
 	return entry

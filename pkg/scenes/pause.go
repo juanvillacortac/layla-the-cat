@@ -1,6 +1,7 @@
 package scenes
 
 import (
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/events"
@@ -30,12 +31,14 @@ func NewPauseScene(main *ecs.ECS, levelEcs *ecs.ECS) *PauseScene {
 	})
 
 	events.RestartLevelEvents.Subscribe(p.ecs.World, func(w donburi.World, event events.RestartLevelEvent) {
+		audio.StopBGM()
+		event.Deaths = components.Level.Get(components.Level.MustFirst(p.levelEcs.World)).Deaths
 		events.RestartLevelEvents.Publish(p.levelEcs.World, event)
 	})
 
 	events.SwitchSceneEvents.Subscribe(p.ecs.World, func(w donburi.World, event events.SceneEvent) {
 		if e, ok := components.Level.First(p.levelEcs.World); ok {
-			components.Level.Get(e).Renderer.Clear()
+			components.MapRenderer.Get(e).Renderer.Clear()
 			query := donburi.NewQuery(filter.Contains())
 			query.Each(p.levelEcs.World, func(e *donburi.Entry) {
 				e.Remove()
@@ -47,14 +50,14 @@ func NewPauseScene(main *ecs.ECS, levelEcs *ecs.ECS) *PauseScene {
 	events.ExitLevelEvents.Subscribe(p.ecs.World, func(w donburi.World, event struct{}) {
 		config.C.Touch = true
 		if e, ok := components.Level.First(p.levelEcs.World); ok {
-			components.Level.Get(e).Renderer.Clear()
+			components.MapRenderer.Get(e).Renderer.Clear()
 			query := donburi.NewQuery(filter.Contains())
 			query.Each(p.levelEcs.World, func(e *donburi.Entry) {
 				e.Remove()
 			})
 		}
 		events.SwitchSceneEvents.Publish(p.main.World, events.SceneEvent{
-			Scene: NewTitleScreenScene(p.main),
+			Scene: NewWorldScreenScene(p.main),
 		})
 	})
 

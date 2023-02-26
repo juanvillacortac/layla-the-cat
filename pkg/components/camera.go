@@ -1,7 +1,6 @@
 package components
 
 import (
-	"layla/pkg/tags"
 	"time"
 
 	"github.com/solarlune/ebitick"
@@ -19,12 +18,13 @@ type CameraData struct {
 	ShakeTimer     *ebitick.Timer
 	ShakeValueX    float64
 	ShakeValueY    float64
+	Lerp           bool
 }
 
 var Camera = donburi.NewComponentType[CameraData]()
 
 func GetCamera(ecs *ecs.ECS) *CameraData {
-	entry, ok := tags.Player.First(ecs.World)
+	entry, ok := Camera.First(ecs.World)
 	if !ok {
 		return &CameraData{}
 	}
@@ -32,7 +32,7 @@ func GetCamera(ecs *ecs.ECS) *CameraData {
 }
 
 func ShakeCamera(ecs *ecs.ECS, magnitude float64, duration time.Duration) {
-	entry, ok := tags.Player.First(ecs.World)
+	entry, ok := Camera.First(ecs.World)
 	if !ok {
 		return
 	}
@@ -48,7 +48,7 @@ func ShakeCamera(ecs *ecs.ECS, magnitude float64, duration time.Duration) {
 }
 
 func StartShakingCamera(ecs *ecs.ECS, magnitude float64) {
-	entry, ok := tags.Player.First(ecs.World)
+	entry, ok := Camera.First(ecs.World)
 	if !ok {
 		return
 	}
@@ -58,7 +58,7 @@ func StartShakingCamera(ecs *ecs.ECS, magnitude float64) {
 }
 
 func StopShakingCamera(ecs *ecs.ECS) {
-	entry, ok := tags.Player.First(ecs.World)
+	entry, ok := Camera.First(ecs.World)
 	if !ok {
 		return
 	}

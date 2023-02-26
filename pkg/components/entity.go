@@ -9,6 +9,7 @@ type EntityLayer int
 const (
 	EntityBackLayer EntityLayer = iota
 	EntityFrontLayer
+	EntityBackgroundLayer
 )
 
 type EntityData struct {

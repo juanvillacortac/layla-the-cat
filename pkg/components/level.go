@@ -8,7 +8,8 @@ import (
 
 type LevelData struct {
 	LdtkProject *maps.LevelCtx
-	Renderer    *maps.EbitenRenderer
+	Number      int
+	Deaths      int
 }
 
 var Level = donburi.NewComponentType[LevelData]()

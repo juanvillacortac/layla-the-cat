@@ -2139,20 +2139,6 @@
 						},
 						{
 							"__identifier": "Pinch",
-							"__grid": [7,5],
-							"__pivot": [0,0],
-							"__tags": [],
-							"__tile": null,
-							"__smartColor": "#94D9B3",
-							"iid": "6354f150-7820-11ed-91f2-a18589b8805a",
-							"width": 16,
-							"height": 16,
-							"defUid": 62,
-							"px": [112,80],
-							"fieldInstances": [{ "__identifier": "FlipY", "__value": false, "__type": "Bool", "__tile": null, "defUid": 63, "realEditorValues": [] }]
-						},
-						{
-							"__identifier": "Pinch",
 							"__grid": [12,24],
 							"__pivot": [0,0],
 							"__tags": [],
@@ -2447,6 +2433,20 @@
 							"height": 16,
 							"defUid": 114,
 							"px": [512,368],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Goal",
+							"__grid": [7,5],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#9B94D9",
+							"iid": "ba3f6030-9f30-11ed-9106-fd52d95636e0",
+							"width": 16,
+							"height": 16,
+							"defUid": 114,
+							"px": [112,80],
 							"fieldInstances": []
 						}
 					]

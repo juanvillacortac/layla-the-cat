@@ -10,7 +10,11 @@ require (
 
 require (
 	github.com/hajimehoshi/bitmapfont/v2 v2.2.3 // indirect
+	github.com/hajimehoshi/go-mp3 v0.3.4 // indirect
 	github.com/hajimehoshi/hitsumabushi v0.0.0-20230202013610-f25407476520 // indirect
+	github.com/hajimehoshi/oto/v2 v2.4.0-alpha.11 // indirect
+	github.com/jfreymuth/oggvorbis v1.0.4 // indirect
+	github.com/jfreymuth/vorbis v1.0.2 // indirect
 	github.com/kvartborg/vector v0.1.2 // indirect
 	github.com/quasilyte/ebitengine-input v0.8.0 // indirect
 	github.com/quasilyte/gmath v0.0.0-20221217210116-fba37a2e15c7 // indirect

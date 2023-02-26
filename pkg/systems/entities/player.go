@@ -2,6 +2,7 @@ package esystems
 
 import (
 	"fmt"
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/events"
 	"layla/pkg/factory"
@@ -109,6 +110,7 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 				px += 4
 			}
 			factory.CreateParticles(ecs, components.ParticlesBackLayer, components.ParticlesJump, px, playerObject.Y, !player.FacingRight)
+			audio.PlaySE("jump.wav")
 		} else if player.WallSliding != nil {
 			// WALLJUMPING
 			player.SpeedY = -PLAYER_JUMP_SPEED
@@ -121,6 +123,7 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 
 			player.WallSliding = nil
 			player.FacingRight = !player.FacingRight
+			audio.PlaySE("jump.wav")
 		}
 	}
 
@@ -157,12 +160,10 @@ func updatePlayerMovement(entry *donburi.Entry, player *components.PlayerData, p
 		if playerObject.Overlaps(check.Objects[0]) && player.OnGround != nil {
 			player.Die = true
 			check.Objects[0].Data = true
-			components.ShakeCamera(ecs, 1, time.Millisecond*200)
+			audio.PlaySE("win.wav")
 			player.CountdownTimer.Cancel()
 			ts.After(time.Second, func() {
-				factory.CreateTransition(ecs, true, func() {
-					events.RestartLevelEvents.Publish(ecs.World, events.RestartLevelEvent{})
-				})
+				factory.CreateStageCleared(ecs)
 			})
 		}
 	}
@@ -379,12 +380,17 @@ func KillPlayer(ecs *ecs.ECS, e *donburi.Entry) {
 	}
 	player.Die = true
 	factory.CreatePlayerCorpse(ecs, playerObject)
+	audio.PlaySE("hit.wav")
 	components.ShakeCamera(ecs, 4, time.Millisecond*200)
 	factory.CreateFlash(ecs, time.Millisecond*100)
 	player.CountdownTimer.Cancel()
+	event := events.RestartLevelEvent{}
+	if e, ok := components.Level.First(ecs.World); ok {
+		event.Deaths = components.Level.Get(e).Deaths + 1
+	}
 	ts.After(time.Second*2, func() {
 		factory.CreateTransition(ecs, true, func() {
-			events.RestartLevelEvents.Publish(ecs.World, events.RestartLevelEvent{})
+			events.RestartLevelEvents.Publish(ecs.World, event)
 		})
 	})
 }

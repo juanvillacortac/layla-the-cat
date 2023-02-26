@@ -35,10 +35,10 @@ func CreatePlayer(ecs *ecs.ECS, x, y float64, viewportW, viewportH int) *donburi
 	loop.Loop = true
 	p.CountdownTimer = loop
 
-	components.SetObject(player, obj)
 	components.Input.Set(player, &components.InputData{})
 	components.Entity.Set(player, &components.EntityData{Identifier: string(entities.Player)})
 	components.Player.Set(player, &p)
+	components.SetObject(player, obj)
 	components.Camera.SetValue(player, components.CameraData{
 		X: x - float64(config.Width)/2,
 		Y: y - float64(config.Height)/2,

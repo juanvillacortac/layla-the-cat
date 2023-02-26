@@ -34,7 +34,7 @@ func init() {
 
 		ActionJump:   {input.KeyGamepadA, input.KeyGamepadB, input.KeySpace, input.KeyW, input.KeyUp},
 		ActionExit:   {input.KeyGamepadStart, input.KeyEscape},
-		ActionSelect: {input.KeyGamepadA, input.KeyEnter, input.KeySpace},
+		ActionSelect: {input.KeyGamepadA, input.KeyEnter, input.KeySpace, input.KeyTouchTap},
 	}
 	Handler = InputSystem.NewHandler(0, keymap)
 }

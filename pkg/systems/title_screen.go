@@ -2,6 +2,7 @@ package systems
 
 import (
 	"layla/pkg/assets"
+	"layla/pkg/audio"
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/events"
@@ -35,9 +36,22 @@ func UpdateTitleScreen(ecs *ecs.ECS) {
 		ts.TouchIDs = inpututil.AppendJustPressedTouchIDs(ts.TouchIDs[:0])
 
 		if inpututil.IsKeyJustPressed(ebiten.KeySpace) || len(ts.TouchIDs) > 0 {
-			factory.CreateTransition(ecs, true, func() {
-				events.LoadLevelEvents.Publish(ecs.World, "grass")
-			})
+			if !ts.Started {
+				ts.Started = true
+				audio.StopBGM()
+				audio.PlaySE("hit.wav")
+				factory.CreateFlash(ecs, time.Millisecond*100)
+				ts.ShowText = true
+				if ts.TextTimer != nil {
+					audio.StopBGM()
+					ts.TextTimer.Cancel()
+				}
+				timers.After(200*time.Millisecond, func() {
+					factory.CreateTransition(ecs, true, func() {
+						events.LoadLevelEvents.Publish(ecs.World, -1)
+					})
+				})
+			}
 		}
 	})
 }

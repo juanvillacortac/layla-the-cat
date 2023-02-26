@@ -2,6 +2,7 @@ package text
 
 import (
 	"fmt"
+	"image/color"
 	"layla/pkg/assets"
 	"log"
 
@@ -59,6 +60,57 @@ func DrawShadowedText(screen *ebiten.Image, txt string, x, y float64, centered b
 	stopt.ColorScale.Scale(0, 0, 0, 1)
 	stopt.ColorScale.ScaleAlpha(0.8)
 	text.DrawWithOptions(screen, txt, *f, stopt)
+	topt := &ebiten.DrawImageOptions{}
+	topt.GeoM.Translate(x, y)
+	text.DrawWithOptions(screen, txt, *f, topt)
+}
+
+func DrawBorderedText(screen *ebiten.Image, txt string, x, y float64, centered bool) {
+	f := LoadFont("ExpressionPro", 16)
+
+	b := text.BoundString(*f, txt)
+	if centered {
+		x -= float64(b.Dx()) / 2
+	}
+
+	y += 8
+
+	tlOpt := &ebiten.DrawImageOptions{}
+	tlOpt.GeoM.Translate(x, y)
+	tlOpt.GeoM.Translate(-1, -1)
+	tlOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, tlOpt)
+
+	blOpt := &ebiten.DrawImageOptions{}
+	blOpt.GeoM.Translate(x, y)
+	blOpt.GeoM.Translate(-1, 1)
+	blOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, blOpt)
+
+	trOpt := &ebiten.DrawImageOptions{}
+	trOpt.GeoM.Translate(x, y)
+	trOpt.GeoM.Translate(1, -1)
+	trOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, trOpt)
+
+	brOpt := &ebiten.DrawImageOptions{}
+	brOpt.GeoM.Translate(x, y)
+	brOpt.GeoM.Translate(1, 1)
+	brOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, brOpt)
+
+	lOpt := &ebiten.DrawImageOptions{}
+	lOpt.GeoM.Translate(x, y)
+	lOpt.GeoM.Translate(-1, 0)
+	lOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, lOpt)
+
+	rOpt := &ebiten.DrawImageOptions{}
+	rOpt.GeoM.Translate(x, y)
+	rOpt.GeoM.Translate(1, 0)
+	rOpt.ColorScale.ScaleWithColor(color.RGBA{24, 20, 37, 255})
+	text.DrawWithOptions(screen, txt, *f, rOpt)
+
 	topt := &ebiten.DrawImageOptions{}
 	topt.GeoM.Translate(x, y)
 	text.DrawWithOptions(screen, txt, *f, topt)
