@@ -43,7 +43,11 @@ func UpdateLevelItem(ecs *ecs.ECS, e *donburi.Entry) {
 	if !ok || !savedData.Unlocked {
 		spr.Anim.GoToFrame(3)
 	} else {
-		spr.Anim.GoToFrame(1)
+		if item.Pressed != components.LevelItemNotPressed {
+			spr.Anim.GoToFrame(2)
+		} else {
+			spr.Anim.GoToFrame(1)
+		}
 	}
 
 	if item.Stroke != nil && ok && savedData.Unlocked {
@@ -62,9 +66,9 @@ func UpdateLevelItem(ecs *ecs.ECS, e *donburi.Entry) {
 			}
 		} else {
 			if x >= obj.X-camera.X && y >= obj.Y-camera.Y && x <= obj.Right()-camera.X && y <= obj.Bottom()-camera.Y && count == 0 && dx == 0 && dy == 0 {
-				spr.Anim.GoToFrame(2)
+				item.Pressed = components.LevelItemTouchPressed
 			} else {
-				spr.Anim.GoToFrame(1)
+				item.Pressed = components.LevelItemNotPressed
 			}
 		}
 	}

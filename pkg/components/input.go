@@ -35,7 +35,7 @@ var (
 )
 
 func UpdateInputLayout() {
-	INPUT_UI_GAP = 8 * int(config.C.InputScale)
+	INPUT_UI_GAP = 8
 	INPUT_UI_PIXEL_CELL_SIZE = 24
 	INPUT_UI_CELL_SIZE = INPUT_UI_PIXEL_CELL_SIZE * int(config.C.InputScale)
 

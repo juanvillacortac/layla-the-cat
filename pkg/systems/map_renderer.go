@@ -4,6 +4,7 @@ import (
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/maps"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
@@ -25,7 +26,7 @@ func drawMapLayer(ecs *ecs.ECS, layer *maps.RenderedLayer, screen *ebiten.Image,
 		}
 		opt := &ebiten.DrawImageOptions{}
 		if camera := components.GetCamera(ecs); camera != nil && !strings.Contains(layer.Layer.Identifier, "_static") {
-			opt.GeoM.Translate(-camera.X/(psf/100), -camera.Y/(psf/100))
+			opt.GeoM.Translate(-math.Round(camera.X)/(psf/100), -math.Round(camera.Y)/(psf/100))
 		}
 		if centered {
 			w, h := layer.Image.Size()

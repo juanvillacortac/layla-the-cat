@@ -27,6 +27,7 @@ import (
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
+	"github.com/yohamta/donburi/query"
 )
 
 func UpdateWorldScreen(ecs *ecs.ECS) {
@@ -95,11 +96,26 @@ func UpdateWorldScreen(ecs *ecs.ECS) {
 			}
 		}
 
-		if input.Handler.ActionIsJustPressed(input.ActionSelect) {
-			audio.StopBGM()
-			factory.CreateTransition(ecs, true, func() {
-				events.LoadLevelEvents.Publish(ecs.World, world.Selected)
-			})
+		var levelItem *components.LevelItemData
+		donburi.NewQuery(filter.Contains(components.LevelItem)).Each(ecs.World, func(e *donburi.Entry) {
+			if item := components.LevelItem.Get(e); item.Number == world.Selected {
+				levelItem = item
+			}
+		})
+
+		count := query.NewQuery(filter.Contains(components.Transition)).Count(ecs.World)
+		if input.Handler.ActionIsPressed(input.ActionSelect) {
+			if levelItem != nil {
+				levelItem.Pressed = components.LevelItemKeyPressed
+			}
+			if count == 0 {
+				audio.StopBGM()
+				factory.CreateTransition(ecs, true, func() {
+					events.LoadLevelEvents.Publish(ecs.World, world.Selected)
+				})
+			}
+		} else if levelItem != nil && levelItem.Pressed == components.LevelItemKeyPressed {
+			levelItem.Pressed = components.LevelItemNotPressed
 		}
 
 		if world.Stroke != nil {
@@ -150,6 +166,9 @@ func DrawWorldScreen(ecs *ecs.ECS, screen *ebiten.Image) {
 				camera := components.GetCamera(ecs)
 				checkOpt := &ebiten.DrawImageOptions{}
 				checkOpt.GeoM.Translate(obj.X-math.Round(camera.X)-6, obj.Y-math.Round(camera.Y)-6)
+				if item.Pressed != components.LevelItemNotPressed {
+					checkOpt.GeoM.Translate(0, 1)
+				}
 				screen.DrawImage(checkImg, checkOpt)
 			}
 		})

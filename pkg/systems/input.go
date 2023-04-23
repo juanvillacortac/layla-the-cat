@@ -6,8 +6,8 @@ import (
 	"layla/pkg/components"
 	"layla/pkg/config"
 	"layla/pkg/events"
-	"layla/pkg/input"
-	"layla/pkg/platform"
+	// "layla/pkg/input"
+	// "layla/pkg/platform"
 	"layla/pkg/text"
 
 	// "layla/pkg/input"
@@ -59,9 +59,9 @@ func DrawInput(ecs *ecs.ECS, screen *ebiten.Image) {
 			}
 		}
 
-		if !config.C.Touch || platform.Platform() == platform.Desktop || input.Handler.GamepadConnected() {
-			return
-		}
+		// if !config.C.Touch || platform.Platform() == platform.Desktop || input.Handler.GamepadConnected() {
+		// 	return
+		// }
 
 		input := components.Input.Get(e)
 

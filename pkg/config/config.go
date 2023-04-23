@@ -25,8 +25,8 @@ func (c *Config) ToggleCrtQuality() {
 }
 
 var (
-	BaseWidth  = 640 / 3
-	BaseHeight = 360 / 3
+	BaseWidth  = 640 / 2
+	BaseHeight = 360 / 2
 	Width      = BaseWidth
 	Height     = BaseHeight
 	Scale      = 3.0
